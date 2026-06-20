@@ -28,3 +28,36 @@ jobs:
       # (Threshold configurado em tests/Directory.Build.props). Falha o job, não só reporta.
       - name: Testes + cobertura (gate 100%)
         run: dotnet test recrd-agile-testing.linux.slnf -c Release /p:CollectCoverage=true
+
+  windows-publish:
+    name: Publish WPF win-x64 (self-contained)
+    needs: build-test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # Etapa Windows: testa tudo (inclui UI.Tests) e publica o exe self-contained (PRD §26, §29).
+      - name: Testes (solução completa)
+        run: dotnet test recrd-agile-testing.sln -c Release
+
+      - name: Publish win-x64 self-contained
+        run: >
+          dotnet publish src/Recrd.App/Recrd.App.csproj
+          -c Release -r win-x64 --self-contained true
+          -o artifacts/publish
+
+      - name: Verifica que o exe foi gerado
+        shell: pwsh
+        run: |
+          $exe = "artifacts/publish/Recrd.App.exe"
+          if (-not (Test-Path $exe)) { throw "exe não gerado: $exe" }
+          Write-Host "OK: $((Get-Item $exe).Length) bytes"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recrd-app-win-x64
+          path: artifacts/publish
