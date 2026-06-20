@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Recrd.Application.Abstractions;
+using Recrd.Application.Auditing;
 using Recrd.Application.Setup;
 using Recrd.Domain.Entities;
 
@@ -7,9 +8,9 @@ namespace Recrd.Application.Runner;
 
 /// <summary>
 /// Executa um caso de teste via Robot Framework e registra a <see cref="Execution"/>
-/// com usuário, data, duração, resultado e log (PRD §15).
+/// com usuário, data, duração, resultado e log (PRD §15). Emite evento de auditoria (§16).
 /// </summary>
-public sealed class TestRunner(IProcessRunner runner, IUserContext user, TimeProvider? clock = null)
+public sealed class TestRunner(IProcessRunner runner, IUserContext user, IAuditTrail audit, TimeProvider? clock = null)
 {
     private readonly TimeProvider _clock = clock ?? TimeProvider.System;
 
@@ -20,7 +21,7 @@ public sealed class TestRunner(IProcessRunner runner, IUserContext user, TimePro
 
         var result = runner.Run("robot", $"--outputdir \"{outputDir}\" \"{robotFilePath}\"");
 
-        return new Execution
+        var execution = new Execution
         {
             TestCaseId = testCase.Id,
             ExecutedAt = startedAt,
@@ -29,5 +30,8 @@ public sealed class TestRunner(IProcessRunner runner, IUserContext user, TimePro
             User = user.Username,
             Log = result.StdOut,
         };
+
+        audit.Executed(execution.TestCaseId, execution.Result.ToString());
+        return execution;
     }
 }

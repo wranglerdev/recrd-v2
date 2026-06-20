@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Recrd.Application.Abstractions;
+using Recrd.Application.Auditing;
 using Recrd.Infrastructure.Data;
 using Recrd.Infrastructure.DependencyInjection;
 using Recrd.Infrastructure.Storage;
@@ -27,6 +28,7 @@ public sealed class ServiceCollectionExtensionsTests : IDisposable
         sp.GetRequiredService<IUserContext>().Should().NotBeNull();
         sp.GetRequiredService<RecrdPaths>().Root.Should().Be(_root);
         sp.GetRequiredService<RecrdDbContext>().Should().NotBeNull();
+        sp.GetRequiredService<IAuditTrail>().Should().NotBeNull();
     }
 
     [Fact]

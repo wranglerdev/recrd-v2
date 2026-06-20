@@ -1,4 +1,5 @@
 using Recrd.Application.Abstractions;
+using Recrd.Application.Auditing;
 using Recrd.Application.Runner;
 using Recrd.Application.Setup;
 using Recrd.Domain.Entities;
@@ -7,7 +8,7 @@ namespace Recrd.Application.Tests;
 
 public class TestRunnerTests
 {
-    private static (TestRunner runner, IProcessRunner proc) Build(int exitCode, string log)
+    private static (TestRunner runner, IAuditTrail audit) Build(int exitCode, string log)
     {
         var proc = Substitute.For<IProcessRunner>();
         proc.Run("robot", Arg.Any<string>()).Returns(new ProcessResult(exitCode, log));
@@ -15,7 +16,8 @@ public class TestRunnerTests
         var user = Substitute.For<IUserContext>();
         user.Username.Returns("DOMAIN\\jose.silva");
 
-        return (new TestRunner(proc, user), proc);
+        var audit = Substitute.For<IAuditTrail>();
+        return (new TestRunner(proc, user, audit), audit);
     }
 
     private static readonly TestCase Case = new() { Name = "Login", TestSuiteId = Guid.NewGuid() };
@@ -23,7 +25,7 @@ public class TestRunnerTests
     [Fact]
     public void Records_passed_execution_with_user_and_log()
     {
-        var (runner, _) = Build(0, "Assertion successful");
+        var (runner, audit) = Build(0, "Assertion successful");
 
         var exec = runner.Run(Case, "/tests/login.robot", "/out");
 
@@ -32,6 +34,7 @@ public class TestRunnerTests
         exec.Log.Should().Be("Assertion successful");
         exec.TestCaseId.Should().Be(Case.Id);
         exec.Duration.Should().BeGreaterThanOrEqualTo(TimeSpan.Zero);
+        audit.Received().Executed(Case.Id, "Passed");
     }
 
     [Fact]
@@ -50,7 +53,8 @@ public class TestRunnerTests
         var user = Substitute.For<IUserContext>();
         var fixed_ = new DateTimeOffset(2026, 6, 20, 10, 35, 0, TimeSpan.Zero);
 
-        var exec = new TestRunner(proc, user, new FixedClock(fixed_)).Run(Case, "f.robot", "/out");
+        var exec = new TestRunner(proc, user, Substitute.For<IAuditTrail>(), new FixedClock(fixed_))
+            .Run(Case, "f.robot", "/out");
 
         exec.ExecutedAt.Should().Be(fixed_);
     }

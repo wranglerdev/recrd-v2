@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Recrd.Application.Abstractions;
+using Recrd.Application.Auditing;
 using Recrd.Infrastructure.Auth;
 using Recrd.Infrastructure.Data;
 using Recrd.Infrastructure.Storage;
@@ -38,6 +39,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IUserContext>(_ => CreateUserContext());
 
         services.AddDbContext<RecrdDbContext>(o => o.UseSqlite($"Data Source={paths.DatabaseFile}"));
+
+        services.AddSingleton<IAuditTrail, AuditTrail>();
 
         return services;
     }
