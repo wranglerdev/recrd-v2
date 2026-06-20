@@ -42,7 +42,7 @@ public static class SelectorGenerator
 
     // ponytail: heurística simples — seletores posicionais são frágeis (PRD §11 exemplo
     // div:nth-child(5)). Refinar (profundidade do encadeamento, classes voláteis) se necessário.
-    private static bool IsStableCss(string css) =>
+    public static bool IsStableCss(string css) =>
         !css.Contains("nth-child", StringComparison.OrdinalIgnoreCase)
         && !css.Contains("nth-of-type", StringComparison.OrdinalIgnoreCase);
 }
