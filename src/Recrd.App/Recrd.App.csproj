@@ -16,6 +16,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <AssemblyName>recrd-agile-testing</AssemblyName>
     <!-- Permite restore/tooling do alvo Windows em Linux dev (build final no CI Windows, PRD §29). -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>

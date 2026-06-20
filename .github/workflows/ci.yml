@@ -53,7 +53,7 @@ jobs:
       - name: Verifica que o exe foi gerado
         shell: pwsh
         run: |
-          $exe = "artifacts/publish/Recrd.App.exe"
+          $exe = "artifacts/publish/recrd-agile-testing.exe"
           if (-not (Test-Path $exe)) { throw "exe não gerado: $exe" }
           Write-Host "OK: $((Get-Item $exe).Length) bytes"
 

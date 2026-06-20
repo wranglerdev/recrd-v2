@@ -21,10 +21,11 @@ dotnet publish $Project `
     --runtime win-x64 `
     --self-contained true `
     --output $publish `
-    /p:Version=$Version
+    /p:Version=$Version /p:PublishSingleFile=true
 
 New-Item -ItemType Directory -Force -Path $release | Out-Null
-Copy-Item "$publish/*.exe" $release -ErrorAction SilentlyContinue
+Copy-Item "$publish/recrd-agile-testing.exe" $release
+Copy-Item "CHANGELOG.md" $release -ErrorAction SilentlyContinue
 
 # version.json — rastreabilidade do build (PRD §30).
 [ordered]@{
