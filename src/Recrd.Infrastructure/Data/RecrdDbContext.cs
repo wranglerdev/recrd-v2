@@ -16,6 +16,7 @@ public sealed class RecrdDbContext(DbContextOptions<RecrdDbContext> options) : D
     public DbSet<TestSuite> TestSuites => Set<TestSuite>();
     public DbSet<TestCase> TestCases => Set<TestCase>();
     public DbSet<Execution> Executions => Set<Execution>();
+    public DbSet<Massa> Massas => Set<Massa>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -31,5 +32,18 @@ public sealed class RecrdDbContext(DbContextOptions<RecrdDbContext> options) : D
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<ScriptAction>>(v, (JsonSerializerOptions?)null) ?? new())
             .Metadata.SetValueComparer(comparer);
+
+        // Massa.Variables (PRD §7) também vira JSON numa coluna.
+        var varsComparer = new ValueComparer<Dictionary<string, string>>(
+            (a, b) => a!.SequenceEqual(b!),
+            v => v.Aggregate(0, (h, x) => HashCode.Combine(h, x.Key.GetHashCode(), x.Value.GetHashCode())),
+            v => new Dictionary<string, string>(v));
+
+        modelBuilder.Entity<Massa>()
+            .Property(m => m.Variables)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, (JsonSerializerOptions?)null) ?? new())
+            .Metadata.SetValueComparer(varsComparer);
     }
 }
