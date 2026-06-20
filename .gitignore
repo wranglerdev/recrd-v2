@@ -1,5 +1,31 @@
-
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db
 .beads-credential-key
+
+# .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+publish/
+release/
+*.user
+
+# Test / coverage
+[Tt]est[Rr]esults/
+coverage/
+*.coverage
+*.trx
+
+# IDE
+.vs/
+.idea/
+*.suo
+
+# recrd runtime data (local-first, PRD §4)
+exports/
+cache/
+logs/
+settings.json

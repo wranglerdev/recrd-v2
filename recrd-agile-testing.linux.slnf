@@ -1,0 +1,13 @@
+{
+  "solution": {
+    "path": "recrd-agile-testing.sln",
+    "projects": [
+      "src\\Recrd.Domain\\Recrd.Domain.csproj",
+      "src\\Recrd.Application\\Recrd.Application.csproj",
+      "src\\Recrd.Infrastructure\\Recrd.Infrastructure.csproj",
+      "tests\\Recrd.Domain.Tests\\Recrd.Domain.Tests.csproj",
+      "tests\\Recrd.Application.Tests\\Recrd.Application.Tests.csproj",
+      "tests\\Recrd.Infrastructure.Tests\\Recrd.Infrastructure.Tests.csproj"
+    ]
+  }
+}

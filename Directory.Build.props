@@ -1,0 +1,11 @@
+<Project>
+
+  <!-- Settings shared by every project. PRD §3 (C# 14 / .NET 10), §31. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>
