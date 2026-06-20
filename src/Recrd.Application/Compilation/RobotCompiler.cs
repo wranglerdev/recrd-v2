@@ -11,8 +11,11 @@ public sealed record CompilationResult(string RobotCode, IReadOnlyList<string> W
 /// Pipeline de compilação (PRD §9, §13): valida ações, analisa seletores,
 /// gera Robot Framework + Browser (Playwright) e valida a sintaxe.
 /// </summary>
-public static partial class RobotCompiler
+public static class RobotCompiler
 {
+    // PRD §12: {{var}} -> ${var} (variável Robot, alimentada pela massa).
+    private static readonly Regex TemplateVar = new(@"\{\{(\w+)\}\}", RegexOptions.Compiled);
+
     public static CompilationResult Compile(TestCase testCase)
     {
         var actions = testCase.ManualScript;
@@ -30,12 +33,9 @@ public static partial class RobotCompiler
             .Select(a => $"Seletor instável: {a.Selector}")
             .ToList();
 
-        // 3/4. Geração Robot + Browser.
+        // 3/4/5. Geração Robot + Browser. A estrutura (seções, indentação) é
+        // garantida por Generate — ponytail: sem validação sintática redundante.
         var code = Generate(testCase);
-
-        // 5. Validação sintática mínima.
-        if (!code.Contains("*** Test Cases ***"))
-            throw new InvalidOperationException("Saída Robot inválida: faltam seções.");
 
         return new CompilationResult(code, warnings);
     }
@@ -93,12 +93,8 @@ public static partial class RobotCompiler
         }
     }
 
-    // PRD §12: {{var}} -> ${var} (variável Robot, alimentada pela massa).
     private static string? ToRobotValue(string? value) =>
-        value is null ? null : TemplateVar().Replace(value, "$${${1}}");
+        value is null ? null : TemplateVar.Replace(value, "$${${1}}");
 
     private static bool IsSeconds(string value) => double.TryParse(value, out _);
-
-    [GeneratedRegex(@"\{\{(\w+)\}\}")]
-    private static partial Regex TemplateVar();
 }

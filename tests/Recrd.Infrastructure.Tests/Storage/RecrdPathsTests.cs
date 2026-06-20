@@ -20,6 +20,15 @@ public class RecrdPathsTests
     }
 
     [Fact]
+    public void Default_root_falls_under_local_app_data()
+    {
+        var expected = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "recrd");
+
+        new RecrdPaths().Root.Should().Be(expected);
+    }
+
+    [Fact]
     public void EnsureCreated_creates_all_directories()
     {
         var root = Path.Combine(Path.GetTempPath(), $"recrd-paths-{Guid.NewGuid():N}");

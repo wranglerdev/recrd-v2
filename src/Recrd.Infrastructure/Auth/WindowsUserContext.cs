@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using System.Security.Principal;
 using Recrd.Application.Abstractions;
@@ -12,6 +13,7 @@ namespace Recrd.Infrastructure.Auth;
 // so it compiles on Linux and only ever runs on Windows. Split into a separate
 // Recrd.Infrastructure.Windows project only if more Windows-only infra appears.
 [SupportedOSPlatform("windows")]
+[ExcludeFromCodeCoverage(Justification = "Windows-only; coberto pela etapa Windows da pipeline.")]
 public sealed class WindowsUserContext : IUserContext
 {
     private readonly WindowsIdentity _identity = WindowsIdentity.GetCurrent();

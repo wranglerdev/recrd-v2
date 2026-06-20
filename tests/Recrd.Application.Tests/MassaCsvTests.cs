@@ -26,6 +26,14 @@ public class MassaCsvTests
     }
 
     [Fact]
+    public void Rejects_empty_csv()
+    {
+        var act = () => MassaCsv.Parse("m", "");
+
+        act.Should().Throw<FormatException>();
+    }
+
+    [Fact]
     public void Rejects_when_value_row_is_missing()
     {
         var act = () => MassaCsv.Parse("m", "usuario,senha");

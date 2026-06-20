@@ -28,6 +28,51 @@ public class SelectorGeneratorTests
     }
 
     [Fact]
+    public void Uses_aria_label_when_no_testid()
+    {
+        var sel = SelectorGenerator.Generate(new ElementInfo("button", AriaLabel: "Entrar", Id: "x"));
+
+        sel.Strategy.Should().Be(SelectorStrategy.AriaLabel);
+        sel.Value.Should().Be("[aria-label=\"Entrar\"]");
+    }
+
+    [Fact]
+    public void Uses_name_when_only_name_present()
+    {
+        var sel = SelectorGenerator.Generate(new ElementInfo("input", Name: "email"));
+
+        sel.Strategy.Should().Be(SelectorStrategy.Name);
+        sel.Value.Should().Be("[name=\"email\"]");
+    }
+
+    [Fact]
+    public void Uses_role_with_tag_prefix()
+    {
+        var sel = SelectorGenerator.Generate(new ElementInfo("button", Role: "submit"));
+
+        sel.Strategy.Should().Be(SelectorStrategy.Role);
+        sel.Value.Should().Be("button[role=\"submit\"]");
+    }
+
+    [Fact]
+    public void Uses_visible_text_when_only_text_present()
+    {
+        var sel = SelectorGenerator.Generate(new ElementInfo("a", Text: "Sair"));
+
+        sel.Strategy.Should().Be(SelectorStrategy.Text);
+        sel.Value.Should().Be("text=Sair");
+    }
+
+    [Fact]
+    public void Stable_css_passes_through()
+    {
+        var sel = SelectorGenerator.Generate(new ElementInfo("div", Css: ".card .title"));
+
+        sel.Strategy.Should().Be(SelectorStrategy.Css);
+        sel.IsStable.Should().BeTrue();
+    }
+
+    [Fact]
     public void Flags_positional_css_as_unstable()
     {
         // PRD §11: div:nth-child(5) -> baixa confiança -> alerta.
@@ -45,6 +90,15 @@ public class SelectorGeneratorTests
         var el = new ElementInfo("div", XPath: "//div[@data-x]");
 
         var sel = SelectorGenerator.Generate(el);
+
+        sel.Strategy.Should().Be(SelectorStrategy.XPath);
+        sel.IsStable.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Relative_xpath_without_leading_slash_is_accepted_as_low_confidence()
+    {
+        var sel = SelectorGenerator.Generate(new ElementInfo("div", XPath: "descendant::div[@x]"));
 
         sel.Strategy.Should().Be(SelectorStrategy.XPath);
         sel.IsStable.Should().BeFalse();

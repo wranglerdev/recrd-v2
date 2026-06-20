@@ -32,6 +32,23 @@ public class ExporterTests
     }
 
     [Fact]
+    public void Compiled_script_uses_precompiled_when_present()
+    {
+        var tc = SampleCase();
+        tc.CompiledScript = "*** Test Cases ***\nPre";
+
+        Exporter.CompiledScript(tc).Content.Should().Be("*** Test Cases ***\nPre");
+    }
+
+    [Fact]
+    public void Execution_log_with_null_log_is_empty()
+    {
+        var exec = new Execution { TestCaseId = Guid.NewGuid() };
+
+        Exporter.ExecutionLog(exec).Content.Should().BeEmpty();
+    }
+
+    [Fact]
     public void Execution_log_is_named_by_date()
     {
         var exec = new Execution

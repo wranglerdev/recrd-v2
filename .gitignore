@@ -17,6 +17,7 @@ release/
 [Tt]est[Rr]esults/
 coverage/
 *.coverage
+*.cobertura.xml
 *.trx
 
 # IDE

@@ -9,6 +9,19 @@
     <FluentAssertionsVersion>7.2.0</FluentAssertionsVersion>
   </PropertyGroup>
 
+  <!-- Cobertura: gate 100% linha+branch (PRD §23). Aplicado só quando CollectCoverage=true.
+       SkipAutoProps ignora POCOs de dados; [ExcludeFromCodeCoverage] tira glue de plataforma;
+       migrations do EF são geradas. Cada projeto define seu Include (só a própria camada). -->
+  <PropertyGroup>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <SkipAutoProps>true</SkipAutoProps>
+    <ExcludeByAttribute>ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+    <Exclude>[*]Recrd.Infrastructure.Data.Migrations.*</Exclude>
+    <Threshold>100</Threshold>
+    <ThresholdType>line,branch</ThresholdType>
+    <ThresholdStat>total</ThresholdStat>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />

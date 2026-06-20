@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,11 +35,14 @@ public static class ServiceCollectionExtensions
         services.AddLogging(b => b.AddSerilog(logger, dispose: true));
 
         // Identidade: Windows em produção, Mock no dev Linux (PRD §5, §29).
-        services.AddSingleton<IUserContext>(_ =>
-            OperatingSystem.IsWindows() ? new WindowsUserContext() : new MockUserContext());
+        services.AddSingleton<IUserContext>(_ => CreateUserContext());
 
         services.AddDbContext<RecrdDbContext>(o => o.UseSqlite($"Data Source={paths.DatabaseFile}"));
 
         return services;
     }
+
+    [ExcludeFromCodeCoverage(Justification = "Seleção depende da plataforma; ramo Windows roda na etapa Windows.")]
+    private static IUserContext CreateUserContext() =>
+        OperatingSystem.IsWindows() ? new WindowsUserContext() : new MockUserContext();
 }

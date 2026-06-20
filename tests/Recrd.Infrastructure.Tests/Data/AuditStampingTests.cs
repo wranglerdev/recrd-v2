@@ -52,6 +52,16 @@ public sealed class AuditStampingTests : IDisposable
         }
     }
 
+    [Fact]
+    public async Task SaveChangesAsync_also_stamps_audit()
+    {
+        await using var ctx = NewContext();
+        ctx.Projects.Add(new Project { Name = "Async" });
+        await ctx.SaveChangesAsync();
+
+        ctx.Projects.Single().CreatedBy.Should().Be("DOMAIN\\jose.silva");
+    }
+
     public void Dispose()
     {
         if (File.Exists(_dbPath)) File.Delete(_dbPath);

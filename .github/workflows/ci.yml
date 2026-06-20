@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    name: Build, análise e testes (gate 100%)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore recrd-agile-testing.sln
+
+      # Static analysis: analisadores .NET + TreatWarningsAsErrors falham o build
+      # com qualquer warning. Release compila inclusive o WPF (EnableWindowsTargeting).
+      - name: Build Release (análise estática)
+        run: dotnet build recrd-agile-testing.sln -c Release --no-restore
+
+      # Testes unitários + integração com gate de cobertura 100% linha/branch
+      # (Threshold configurado em tests/Directory.Build.props). Falha o job, não só reporta.
+      - name: Testes + cobertura (gate 100%)
+        run: dotnet test recrd-agile-testing.linux.slnf -c Release /p:CollectCoverage=true

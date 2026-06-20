@@ -20,6 +20,19 @@ public sealed class RecrdDbContextTests : IDisposable
     }
 
     [Fact]
+    public void All_dbsets_are_queryable()
+    {
+        using var ctx = NewContext();
+
+        ctx.Projects.Count().Should().Be(0);
+        ctx.TestPlans.Count().Should().Be(0);
+        ctx.TestSuites.Count().Should().Be(0);
+        ctx.TestCases.Count().Should().Be(0);
+        ctx.Executions.Count().Should().Be(0);
+        ctx.Massas.Count().Should().Be(0);
+    }
+
+    [Fact]
     public void Persists_project_tree_and_round_trips_manual_script()
     {
         var caseId = Guid.NewGuid();

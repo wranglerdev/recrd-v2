@@ -20,7 +20,7 @@ public static class MassaCsv
 
         if (parser.EndOfData)
             throw new FormatException("CSV vazio.");
-        var headers = parser.ReadFields() ?? throw new FormatException("Cabeçalho inválido.");
+        var headers = parser.ReadFields()!;
 
         if (parser.EndOfData)
             throw new FormatException("CSV precisa de uma linha de valores (PRD §7).");

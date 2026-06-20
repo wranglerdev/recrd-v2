@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -52,6 +53,7 @@ public sealed class RecrdDbContext(DbContextOptions<RecrdDbContext> options, IUs
         }
     }
 
+    [ExcludeFromCodeCoverage(Justification = "Mapeamento declarativo do EF, não lógica de negócio.")]
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // ManualScript é a representação intermediária — guardada como JSON numa coluna (PRD §6).
