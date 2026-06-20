@@ -1,0 +1,34 @@
+<Window x:Class="Recrd.App.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sobre — recrd-agile-testing" Height="220" Width="420"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="recrd-agile-testing"
+                   FontSize="18" FontWeight="Bold" Margin="0,0,0,12" />
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Versão:" FontWeight="SemiBold" Margin="0,2,12,2" />
+        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="VersionText" Margin="0,2" />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Commit:" FontWeight="SemiBold" Margin="0,2,12,2" />
+        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="CommitText" Margin="0,2" />
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Build:" FontWeight="SemiBold" Margin="0,2,12,2" />
+        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="BuildDateText" Margin="0,2" />
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Target:" FontWeight="SemiBold" Margin="0,2,12,2" />
+        <TextBlock Grid.Row="4" Grid.Column="1" x:Name="TargetText" Margin="0,2" />
+    </Grid>
+</Window>
