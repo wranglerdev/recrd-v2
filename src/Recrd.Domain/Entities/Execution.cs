@@ -7,9 +7,8 @@ public enum ExecutionResult
 }
 
 /// <summary>Registro de uma execução de caso de teste (PRD §6, §15).</summary>
-public sealed class Execution
+public sealed class Execution : AuditableEntity
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
     public Guid TestCaseId { get; set; }
     public DateTimeOffset ExecutedAt { get; set; } = DateTimeOffset.UtcNow;
     public ExecutionResult Result { get; set; }

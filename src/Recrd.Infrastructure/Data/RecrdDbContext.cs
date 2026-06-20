@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Recrd.Application.Abstractions;
 using Recrd.Domain.Entities;
 
 namespace Recrd.Infrastructure.Data;
@@ -8,8 +9,10 @@ namespace Recrd.Infrastructure.Data;
 /// <summary>
 /// Contexto EF Core/SQLite local-first (PRD §3, §4, §6). A hierarquia
 /// Project>TestPlan>TestSuite>TestCase é descoberta por convenção (FKs).
+/// Carimba auditoria (PRD §16) usando <see cref="IUserContext"/>.
 /// </summary>
-public sealed class RecrdDbContext(DbContextOptions<RecrdDbContext> options) : DbContext(options)
+public sealed class RecrdDbContext(DbContextOptions<RecrdDbContext> options, IUserContext? user = null)
+    : DbContext(options)
 {
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<TestPlan> TestPlans => Set<TestPlan>();
@@ -17,6 +20,37 @@ public sealed class RecrdDbContext(DbContextOptions<RecrdDbContext> options) : D
     public DbSet<TestCase> TestCases => Set<TestCase>();
     public DbSet<Execution> Executions => Set<Execution>();
     public DbSet<Massa> Massas => Set<Massa>();
+
+    public override int SaveChanges()
+    {
+        StampAudit();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        StampAudit();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void StampAudit()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var who = user?.Username;
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedAt = now;
+                entry.Entity.CreatedBy = who;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.UpdatedAt = now;
+                entry.Entity.UpdatedBy = who;
+            }
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

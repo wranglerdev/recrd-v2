@@ -12,9 +12,8 @@ public enum TestCaseStatus
 /// Caso de teste com seu script manual (ações gravadas), o script Robot
 /// compilado e o histórico de execuções (PRD §6).
 /// </summary>
-public sealed class TestCase
+public sealed class TestCase : AuditableEntity
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
     public Guid TestSuiteId { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
