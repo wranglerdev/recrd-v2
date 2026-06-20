@@ -48,7 +48,7 @@ public partial class MainWindow : Window
     private void ImportarMassa_Click(object sender, RoutedEventArgs e) => NotImplemented("Importar Massa");
     private void AbrirUltimoProjeto_Click(object sender, RoutedEventArgs e) => NotImplemented("Abrir Último Projeto");
 
-    private void GravarTeste_Click(object sender, RoutedEventArgs e) => NotImplemented("Gravar Novo Teste");
+    private void GravarTeste_Click(object sender, RoutedEventArgs e) => new AutomationWindow { Owner = this }.Show();
 
     private void Sobre_Click(object sender, RoutedEventArgs e) => new AboutWindow { Owner = this }.ShowDialog();
 
