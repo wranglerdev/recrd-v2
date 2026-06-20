@@ -34,7 +34,8 @@
                         <ListBox x:Name="Timeline" BorderThickness="0" />
                     </TabItem>
                     <TabItem Header="Massas">
-                        <ListBox x:Name="MassasList" BorderThickness="0" />
+                        <!-- Variáveis arrastáveis p/ campos no sandbox (PRD §12). -->
+                        <ListBox x:Name="MassasList" BorderThickness="0" PreviewMouseMove="MassasList_PreviewMouseMove" />
                     </TabItem>
                     <TabItem Header="Propriedades">
                         <TextBlock x:Name="Properties" TextWrapping="Wrap" Margin="4"

@@ -42,6 +42,34 @@ public partial class BrowserSandbox : UserControl
 
     public void Reload() => Web.CoreWebView2?.Reload();
 
+    /// <summary>
+    /// Drag-and-drop de massa (PRD §12): solta a variável sobre o elemento na
+    /// posição dada e grava <c>{{variavel}}</c> — não o valor literal.
+    /// </summary>
+    public async Task DropVariableAsync(string variable, System.Windows.Point posInWeb)
+    {
+        if (!_ready) return;
+        var tpl = "{{" + variable + "}}";
+        // ponytail: posição em DIPs ≈ CSS px a 100%/zoom 1. Ajustar por DevicePixelRatio
+        // se a app rodar com zoom/DPI != 100%.
+        var x = posInWeb.X.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var y = posInWeb.Y.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var result = await Web.CoreWebView2.ExecuteScriptAsync(
+            $"window.__recrdDrop({x},{y},{JsonSerializer.Serialize(tpl)})");
+        if (result is null or "null") return;
+
+        using var doc = JsonDocument.Parse(result);
+        var el = ToElementInfo(doc.RootElement);
+        var selector = TryGenerate(el);
+        ActionCaptured?.Invoke(this, new CapturedAction(new ScriptAction(ActionKind.Input, selector?.Value, tpl), selector));
+    }
+
+    private async void OnDrop(object sender, System.Windows.DragEventArgs e)
+    {
+        if (e.Data.GetData(System.Windows.DataFormats.StringFormat) is string variable)
+            await DropVariableAsync(variable, e.GetPosition(Web));
+    }
+
     public void Navigate(string url)
     {
         if (string.IsNullOrWhiteSpace(url)) return;
@@ -53,6 +81,8 @@ public partial class BrowserSandbox : UserControl
     {
         await Web.EnsureCoreWebView2Async();
         Web.CoreWebView2.Settings.IsWebMessageEnabled = true;
+        // Deixa o host WPF tratar o drop da massa em vez do Chromium (PRD §12).
+        Web.AllowExternalDrop = false;
         await Web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(CaptureScript);
         Web.CoreWebView2.WebMessageReceived += OnWebMessage;
         // Captura de navegação/URL (PRD §10): toda troca de página vira uma ação.
@@ -148,6 +178,14 @@ public partial class BrowserSandbox : UserControl
             if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT'))
               window.chrome.webview.postMessage({ kind: 'capture', action: 'input', el: info(t), value: t.value });
           }, true);
+          // Expostos p/ o drag-and-drop de massa (PRD §12).
+          window.__recrdInfo = info;
+          window.__recrdDrop = function (x, y, tpl) {
+            var el = document.elementFromPoint(x, y);
+            if (!el) return null;
+            if ('value' in el) { el.value = tpl; el.dispatchEvent(new Event('input', { bubbles: true })); }
+            return info(el);
+          };
           var last = 0;
           document.addEventListener('mousemove', function (e) {
             if (!window.__recrdInspect) return;

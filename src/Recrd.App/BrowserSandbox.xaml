@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
     <!-- Browser Sandbox (PRD §10): barra de endereço + Chromium embarcado. -->
-    <DockPanel>
+    <DockPanel AllowDrop="True" Drop="OnDrop">
         <DockPanel DockPanel.Dock="Top" Margin="4">
             <Button DockPanel.Dock="Right" Content="Ir" Padding="12,2" Margin="4,0,0,0" Click="Go_Click" />
             <TextBox x:Name="AddressBar" KeyDown="AddressBar_KeyDown" VerticalContentAlignment="Center" />

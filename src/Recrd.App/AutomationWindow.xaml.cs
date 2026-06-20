@@ -1,21 +1,45 @@
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Recrd.Infrastructure.Data;
 
 namespace Recrd.App;
 
 /// <summary>
-/// Tela de automação (PRD §9): casca de layout (header + sidebar + sandbox).
-/// Os controles do header ganham comportamento conforme o sandbox/compilador
-/// são plugados nas próximas issues.
+/// Tela de automação (PRD §9): header + sidebar + Browser Sandbox.
 /// </summary>
 public partial class AutomationWindow : Window
 {
-    public AutomationWindow()
+    public AutomationWindow(IServiceScopeFactory scopes)
     {
         InitializeComponent();
         Sandbox.ActionCaptured += OnActionCaptured;
         Sandbox.ElementInspected += OnElementInspected;
         InspectToggle.Checked += (_, _) => Sandbox.InspectMode = true;
         InspectToggle.Unchecked += (_, _) => Sandbox.InspectMode = false;
+        LoadMassaVariables(scopes);
+    }
+
+    private void LoadMassaVariables(IServiceScopeFactory scopes)
+    {
+        using var scope = scopes.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<RecrdDbContext>();
+        // Nomes de variáveis de todas as massas — arrastáveis p/ campos (PRD §12).
+        MassasList.ItemsSource = db.Massas.AsNoTracking()
+            .ToList()
+            .SelectMany(m => m.Variables.Keys)
+            .Distinct()
+            .OrderBy(k => k)
+            .ToList();
+    }
+
+    // Inicia o drag da variável selecionada (PRD §12).
+    private void MassasList_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton == MouseButtonState.Pressed && MassasList.SelectedItem is string variable)
+            DragDrop.DoDragDrop(MassasList, variable, DragDropEffects.Copy);
     }
 
     // Gravação: cada ação capturada entra na Timeline; seletor instável avisa (PRD §11).
