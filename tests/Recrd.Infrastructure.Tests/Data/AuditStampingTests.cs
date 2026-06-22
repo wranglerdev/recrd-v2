@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Recrd.Application.Abstractions;
 using Recrd.Domain.Entities;
@@ -64,6 +65,7 @@ public sealed class AuditStampingTests : IDisposable
 
     public void Dispose()
     {
+        SqliteConnection.ClearAllPools();
         if (File.Exists(_dbPath)) File.Delete(_dbPath);
     }
 }

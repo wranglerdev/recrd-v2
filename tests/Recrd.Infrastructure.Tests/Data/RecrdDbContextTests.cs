@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Recrd.Domain.Entities;
 using Recrd.Infrastructure.Data;
@@ -62,6 +63,7 @@ public sealed class RecrdDbContextTests : IDisposable
 
     public void Dispose()
     {
+        SqliteConnection.ClearAllPools();
         if (File.Exists(_dbPath))
             File.Delete(_dbPath);
     }
